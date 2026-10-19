@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+<rect width="1200" height="420" rx="22" fill="#f7f8fc"/>
+<text x="600" y="42" font-family="Arial" font-size="27" text-anchor="middle" fill="#183153" font-weight="bold">Cascade PID Control Architecture</text>
+<g font-family="Arial" font-size="18" text-anchor="middle" fill="#183153" stroke="#49627d" stroke-width="2">
+<rect x="35" y="130" width="145" height="72" rx="12" fill="#dce9ff"/><text x="107" y="160" stroke="none">Position</text><text x="107" y="183" stroke="none">reference x*</text>
+<rect x="235" y="130" width="160" height="72" rx="12" fill="#e5dcff"/><text x="315" y="160" stroke="none">Position</text><text x="315" y="183" stroke="none">PID</text>
+<rect x="450" y="130" width="155" height="72" rx="12" fill="#ffedc9"/><text x="527" y="160" stroke="none">Pitch</text><text x="527" y="183" stroke="none">command θ*</text>
+<rect x="660" y="130" width="160" height="72" rx="12" fill="#e5dcff"/><text x="740" y="160" stroke="none">Attitude</text><text x="740" y="183" stroke="none">PID</text>
+<rect x="875" y="130" width="130" height="72" rx="12" fill="#ffedc9"/><text x="940" y="160" stroke="none">Pitch</text><text x="940" y="183" stroke="none">torque τθ</text>
+<rect x="1030" y="130" width="135" height="72" rx="12" fill="#d8f2e7"/><text x="1097" y="160" stroke="none">Quadrotor</text><text x="1097" y="183" stroke="none">plant</text>
+<g fill="none" stroke="#49627d" stroke-width="3"><path d="M180 166 L235 166"/><path d="M220 156 L235 166 L220 176"/><path d="M395 166 L450 166"/><path d="M435 156 L450 166 L435 176"/><path d="M605 166 L660 166"/><path d="M645 156 L660 166 L645 176"/><path d="M820 166 L875 166"/><path d="M860 156 L875 166 L860 176"/><path d="M1005 166 L1030 166"/><path d="M1015 156 L1030 166 L1015 176"/></g>
+<rect x="450" y="280" width="155" height="65" rx="12" fill="#dce9ff"/><text x="527" y="307" stroke="none">Altitude PID</text><text x="527" y="329" stroke="none">thrust T</text>
+<rect x="875" y="280" width="130" height="65" rx="12" fill="#d8f2e7"/><text x="940" y="307" stroke="none">Wind</text><text x="940" y="329" stroke="none">disturbance</text>
+<path d="M605 312 L1030 312 L1030 205" fill="none" stroke="#49627d" stroke-width="3"/><path d="M1020 220 L1030 205 L1040 220" fill="none" stroke="#49627d" stroke-width="3"/>
+<path d="M1097 202 L1097 245 L315 245 L315 202" fill="none" stroke="#49627d" stroke-width="2.5" stroke-dasharray="8 7"/>
+<path d="M305 217 L315 202 L325 217" fill="none" stroke="#49627d" stroke-width="2.5"/>
+<text x="700" y="236" font-family="Arial" font-size="15" fill="#49627d" stroke="none">measured position feedback</text>
+</g>
+</svg>

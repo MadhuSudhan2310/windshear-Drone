@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520">
+<rect width="1100" height="520" rx="24" fill="#f4f7fb"/>
+<text x="550" y="48" font-family="Arial" font-size="28" text-anchor="middle" fill="#183153" font-weight="bold">Quadrotor Drone — Planar Wind-Shear Model</text>
+<g stroke="#24476b" stroke-width="12" stroke-linecap="round" fill="none">
+<path d="M420 240 L680 240"/><path d="M455 205 L645 275"/>
+</g>
+<g fill="#5a8dee" stroke="#24476b" stroke-width="4">
+<ellipse cx="400" cy="235" rx="70" ry="18"/><ellipse cx="700" cy="235" rx="70" ry="18"/>
+<ellipse cx="465" cy="195" rx="58" ry="16"/><ellipse cx="635" cy="275" rx="58" ry="16"/>
+<rect x="500" y="215" width="100" height="50" rx="16" fill="#f2b84b"/>
+</g>
+<g font-family="Arial" font-size="19" fill="#183153">
+<text x="400" y="180" text-anchor="middle">Motor 1</text><text x="700" y="180" text-anchor="middle">Motor 2</text>
+<text x="465" y="155" text-anchor="middle">Motor 3</text><text x="635" y="330" text-anchor="middle">Motor 4</text>
+<text x="550" y="247" text-anchor="middle" font-weight="bold">CG</text>
+</g>
+<g stroke="#dc5a52" stroke-width="5" fill="none" stroke-linecap="round">
+<path d="M550 215 L550 115"/><path d="M535 132 L550 115 L565 132"/>
+</g>
+<text x="575" y="130" font-family="Arial" font-size="20" fill="#b13f38">z / altitude</text>
+<g stroke="#218b68" stroke-width="5" fill="none" stroke-linecap="round">
+<path d="M550 240 L820 240"/><path d="M800 225 L820 240 L800 255"/>
+</g>
+<text x="700" y="218" font-family="Arial" font-size="20" fill="#17694f">x / forward</text>
+<g stroke="#8a61c2" stroke-width="4" fill="none" stroke-dasharray="10 8">
+<path d="M120 170 C180 140 220 140 280 170"/><path d="M120 230 C180 200 220 200 280 230"/><path d="M120 290 C180 260 220 260 280 290"/>
+</g>
+<g font-family="Arial" font-size="20" fill="#62409a">
+<text x="200" y="115" text-anchor="middle" font-weight="bold">Wind shear</text>
+<text x="200" y="345" text-anchor="middle">Horizontal gust + downdraft</text>
+</g>
+<g stroke="#183153" stroke-width="3" fill="none"><path d="M100 420 L1000 420"/><path d="M100 420 L100 385"/><path d="M1000 420 L980 408 L980 432 Z" fill="#183153"/></g>
+<text x="550" y="465" font-family="Arial" font-size="19" text-anchor="middle" fill="#183153">Simplified horizontal position, altitude and pitch dynamics</text>
+</svg>
