@@ -1,51 +1,52 @@
-# Quadrotor Drone Wind Shear Simulation Using PID Control
+# Quadrotor Drone Wind-Shear Simulation Using PID Control
 
-![Quadrotor Drone](images/quadrotor_windshear_model.svg)
+![MATLAB](https://img.shields.io/badge/MATLAB-Simulation-orange?logo=mathworks)
+![Simulink](https://img.shields.io/badge/Simulink-Control%20System-blue)
+![Language](https://img.shields.io/badge/Language-MATLAB%20%7C%20Python-green)
+![Project](https://img.shields.io/badge/Project-Drone%20Dynamics-lightgrey)
 
-## 📌 Project Overview
+## 1. Project Overview
 
-This project focuses on the simulation of a quadrotor drone operating under wind shear and downdraft conditions using MATLAB and Simulink. A cascaded PID controller is designed to maintain horizontal position, altitude, and pitch attitude despite external wind disturbances.
+This project studies the response of a quadrotor drone under wind shear and downdraft disturbances using PID-based control.
 
-The project also compares PID and PD controllers to evaluate position tracking, steady-state error, and drone stability.
+The system models horizontal position, altitude, pitch attitude, aerodynamic drag, and motor response. The main objective is to maintain stable drone position and altitude despite changing wind conditions.
 
-## 🎯 Objectives
+The project uses MATLAB and Simulink for model development, with a Python implementation used for preliminary controller tuning and analysis.
+
+## 2. Objectives
 
 - Develop a simplified quadrotor drone dynamics model.
-- Simulate horizontal wind shear and vertical downdrafts.
-- Implement altitude, position, and pitch PID controllers.
-- Compare PID and PD-only controller performance.
-- Study the effects of wind intensity on drone stability.
-- Analyze position error, altitude error, and pitch angle.
-- Explore improvements for robust UAV flight control.
+- Implement PID control for position, altitude, and pitch.
+- Simulate horizontal wind shear and vertical downdraft.
+- Compare PID and PD-only controllers.
+- Analyze position error and altitude response.
+- Study the effect of wind intensity on drone stability.
+- Investigate the effect of PID gain selection on overshoot and performance.
 
-## 🛠️ Tools and Technologies
-
-- MATLAB
-- Simulink
-- PID Control Systems
-- Quadrotor Dynamics
-- Wind Disturbance Modelling
-- Python for preliminary equation-based testing
-
-## 🚁 Drone Model Parameters
+## 3. System Specifications
 
 | Parameter | Value |
-|---|---:|
+|---|---|
+| Drone type | Quadrotor UAV |
 | Drone mass | 1.5 kg |
-| Maximum horizontal wind | 8 m/s |
-| Maximum downdraft | 3 m/s |
-| Wind gust start time | 10 s |
-| Wind transition duration | 8 s |
-| Motor response time | 30 ms |
-| Configured maximum tilt | 25° |
+| Maximum horizontal wind in baseline study | 8 m/s |
+| Gust start time | 10 seconds |
+| Gust transition duration | 8 seconds |
+| Maximum downdraft magnitude | 3 m/s |
+| Nominal motor response time constant | 0.03 seconds |
+| Configured pitch limit | 25 degrees |
+| Control method | PID |
+| Simulation environment | MATLAB / Simulink |
 
 These are representative study parameters. Refer to `drone_windshear_params.m` for the actual implementation values.
 
-## 📐 Mathematical Equations
+## 4. Quadrotor Drone Dynamics
 
-### 1. Horizontal Motion
+The simplified planar drone model considers horizontal motion, vertical motion, and pitch attitude.
 
-The simplified horizontal dynamics are
+### 4.1 Horizontal Motion
+
+The horizontal equation of motion is
 
 \[
 m\ddot{x}=-T\sin\theta+D_x
@@ -55,45 +56,29 @@ where:
 
 - \(m\) = drone mass (kg)
 - \(x\) = horizontal position (m)
-- \(T\) = total thrust (N)
+- \(T\) = total rotor thrust (N)
 - \(\theta\) = pitch angle (rad)
 - \(D_x\) = horizontal aerodynamic drag (N)
 
-A simple drag model is
+### 4.2 Vertical Motion
 
-\[
-D_x=-c_x(\dot{x}-w_x)
-\]
-
-where \(c_x\) is an effective drag coefficient and \(w_x\) is horizontal wind velocity.
-
-### 2. Vertical Motion
-
-The altitude dynamics are
+The vertical equation is
 
 \[
 m\ddot{z}=T\cos\theta-mg+D_z
 \]
 
-where \(z\) is altitude, \(g=9.81\,\text{m/s}^2\), and \(D_z\) is vertical aerodynamic drag.
+where:
 
-For level hover,
+- \(z\) = altitude (m)
+- \(g\) = gravitational acceleration, approximately \(9.81\,m/s^2\)
+- \(D_z\) = vertical aerodynamic force (N)
 
-\[
-T_{\text{hover}}=mg
-\]
+The sign convention assumes altitude is positive upward.
 
-For a 1.5 kg drone,
+### 4.3 Pitch Dynamics
 
-\[
-T_{\text{hover}}=1.5\times9.81=14.715\text{ N}
-\]
-
-This represents the combined thrust of all four motors.
-
-### 3. Pitch Dynamics
-
-The simplified pitch-axis equations are
+The simplified pitch dynamics are
 
 \[
 \dot{\theta}=q
@@ -103,222 +88,316 @@ The simplified pitch-axis equations are
 I_y\dot{q}=\tau_\theta-c_q q
 \]
 
-where \(I_y\) is pitch moment of inertia, \(q\) is pitch rate, and \(\tau_\theta\) is the control torque.
+where:
 
-### 4. PID Controller
+- \(q\) = pitch angular velocity (rad/s)
+- \(I_y\) = pitch moment of inertia
+- \(\tau_\theta\) = pitch control torque
+- \(c_q\) = rotational damping coefficient
 
-The general PID control equation is
+### 4.4 Hover Thrust
+
+For steady hover,
 
 \[
-u(t)=K_p e(t)+K_i\int e(t)\,dt+K_d\frac{de(t)}{dt}
+T_{\text{hover}}=mg
 \]
 
-where
+For a 1.5 kg drone,
+
+\[
+T_{\text{hover}}=1.5\times9.81
+\]
+
+\[
+\boxed{T_{\text{hover}}=14.715\,N}
+\]
+
+This is the combined thrust generated by all four motors.
+
+### 4.5 Motor Response
+
+A first-order approximation of motor or thrust response is
+
+\[
+\tau_m\frac{dT}{dt}+T=T_{\text{cmd}}
+\]
+
+where \(\tau_m=0.03\,s\) is the nominal response time constant.
+
+## 5. PID Controller Design
+
+The PID controller reduces the difference between the reference signal and the measured output.
+
+The general PID equation is
+
+\[
+u(t)=K_p e(t)+K_i\int_0^t e(\lambda)\,d\lambda+K_d\frac{de(t)}{dt}
+\]
+
+where:
 
 - \(K_p\) = proportional gain
 - \(K_i\) = integral gain
 - \(K_d\) = derivative gain
-- \(e(t)\) = reference minus measured output
+- \(e(t)\) = control error
+- \(u(t)\) = controller output
 
-### 5. Position PID
+### 5.1 Position PID Controller
+
+The horizontal position error is
 
 \[
 e_x=x_{\text{ref}}-x
 \]
 
+The position controller generates a pitch command:
+
 \[
 \theta_{\text{cmd}}=
-K_{px}e_x+K_{ix}\int e_x\,dt+K_{dx}\dot{e}_x
+K_{px}e_x+
+K_{ix}\int e_x\,dt+
+K_{dx}\frac{de_x}{dt}
 \]
 
-The commanded pitch angle is limited to the configured tilt range.
+The pitch command is limited to the configured maximum tilt angle.
 
-### 6. Altitude PID
+### 5.2 Altitude PID Controller
+
+The altitude error is
 
 \[
 e_z=z_{\text{ref}}-z
 \]
 
+The thrust command can be expressed as
+
 \[
 T_{\text{cmd}}=mg+
 K_{pz}e_z+
 K_{iz}\int e_z\,dt+
-K_{dz}\dot{e}_z
+K_{dz}\frac{de_z}{dt}
 \]
 
-The hover-thrust term is included when the controller outputs total thrust and the implementation uses this control convention.
+The \(mg\) term compensates for gravity. Include it only if the implemented controller does not already account for hover thrust.
 
-### 7. Pitch Attitude PID
+### 5.3 Pitch Attitude PID Controller
+
+The pitch error is
 
 \[
 e_\theta=\theta_{\text{cmd}}-\theta
 \]
 
+The pitch control command is
+
 \[
-\tau_{\theta,\text{cmd}}=
+\tau_\theta=
 K_{p\theta}e_\theta+
 K_{i\theta}\int e_\theta\,dt+
-K_{d\theta}\dot{e}_\theta
+K_{d\theta}\frac{de_\theta}{dt}
 \]
 
-Derivative filtering and anti-windup help reduce noise sensitivity and integral accumulation during saturation.
+This inner control loop helps the drone track the pitch command generated by the position controller.
 
-## 🌬️ Wind Shear Model
+### 5.4 Why Integral Control Is Important
 
-Wind shear represents a change in wind velocity over time or altitude.
+A persistent wind disturbance can cause steady position error in a PD-only controller. Integral action accumulates the error over time and can compensate for persistent disturbances.
 
-A simplified horizontal wind model is
+Derivative filtering helps reduce sensitivity to measurement noise, while anti-windup prevents excessive accumulation of the integral term when the controller output reaches its limits.
+
+## 6. Wind-Shear Modelling
+
+Wind shear occurs when wind velocity changes with altitude or position.
+
+The simulation considers:
+
+- A horizontal gust front beginning at 10 seconds.
+- A transition toward 8 m/s wind over 8 seconds.
+- A downdraft reaching a magnitude of up to 3 m/s.
+- A horizontal wind profile that increases with altitude.
+
+A general wind profile can be represented as
 
 \[
-w_x(t,z)=w_{\text{base}}(z)+\Delta w S(t)
+w_x(t,z)=w_{\text{base}}(z)+\Delta w\,S(t)
 \]
 
-where \(S(t)\) represents the gust transition.
+where:
 
-For a smooth transition,
+- \(w_x\) = horizontal wind velocity
+- \(w_{\text{base}}(z)\) = altitude-dependent baseline wind
+- \(\Delta w\) = gust amplitude
+- \(S(t)\) = time-dependent gust transition function
+
+One possible smooth transition is
 
 \[
-S(t)=3r^2-2r^3
+S(t)=
+\begin{cases}
+0, & t<t_0\\
+3r^2-2r^3, & t_0\le t\le t_0+T_g\\
+1, & t>t_0+T_g
+\end{cases}
 \]
 
-with
+where
 
 \[
 r=\frac{t-t_0}{T_g}
 \]
 
-during the gust transition interval.
+and \(t_0=10\,s\), \(T_g=8\,s\).
 
-The example gust begins at \(t_0=10\) seconds and increases toward 8 m/s over approximately 8 seconds. A downdraft of up to 3 m/s is also considered.
+This is a general example of a smooth gust profile. The exact implementation should be taken from the MATLAB project files.
 
-## 🔄 PID Control Architecture
+## 7. Control System Architecture
 
-![PID Control Architecture](images/pid_control_architecture.svg)
+The control architecture contains three main loops:
 
-The control system contains three main loops:
+1. **Position loop:** calculates the desired pitch angle.
+2. **Pitch loop:** controls the drone's pitch response.
+3. **Altitude loop:** adjusts total thrust to maintain altitude.
 
-1. **Position PID:** calculates the desired pitch angle from horizontal position error.
-2. **Attitude PID:** controls pitch response to track the desired angle.
-3. **Altitude PID:** adjusts thrust to maintain the desired altitude.
+The wind disturbance acts on the drone dynamics, and feedback from the simulated position, altitude, and attitude is used to calculate corrective commands.
 
-The wind disturbance enters the drone dynamics, while measured position, altitude, and attitude are fed back to their respective controllers.
+## 8. Simulation Studies
 
-## 🧪 Simulation Studies
-
-Three studies are included in the project:
+The project includes three planned studies.
 
 ### Study 1: PID vs PD Controller
 
-Compare the response of a PID controller with a PD-only controller under persistent wind.
+Compares the position response of a PID controller against a PD-only controller under persistent wind disturbance.
 
-### Study 2: Wind Intensity Analysis
+### Study 2: Wind-Intensity Sweep
 
-Increase wind intensity and observe position error, required tilt angle, and tracking performance.
+Increases wind intensity and measures its effect on position error and required pitch angle.
 
-### Study 3: Position Gain Comparison
+### Study 3: Position-Gain Comparison
 
-Vary position-loop gains to understand the trade-off between drift reduction and overshoot.
+Investigates the relationship between position-loop gain, drift reduction, and step-response overshoot.
 
-## 📊 Preliminary Results
+## 9. Preliminary Results
 
-The following values were reported by the preliminary Python equation-based study for the 8 m/s wind case. They have not yet been independently verified by running the Simulink model.
+The preliminary Python-equation study reported the following values for the 8 m/s wind case.
 
-| Controller | Peak Position Error | Final Position Error | Peak Tilt |
-|---|---:|---:|---:|
-| PID | 0.49 m | 0 m | 9.6° |
-| PD only | 0.70 m | 0.70 m | 9.5° |
+| Performance parameter | PID | PD-only |
+|---|---:|---:|
+| Peak position error | 0.49 m | 0.70 m |
+| Final position error | 0 m | 0.70 m |
+| Peak tilt | 9.6° | 9.5° |
 
-### Observations
+Additional observations reported:
 
-- Integral action helps compensate for persistent disturbances.
-- PD-only control can retain a steady position offset.
-- Stronger wind requires greater control effort and drone tilt.
-- Aggressive position gains can increase overshoot.
-- Altitude control performance depends on controller gains, thrust limits, and downdraft strength.
+- The PID controller recovered the position offset in the tested scenario.
+- The PD-only controller retained a steady position offset.
+- At 20 m/s wind, the reported tilt reached approximately 23°, close to the configured 25° limit.
+- The highest tested position-gain setting produced approximately 54% calm-air step overshoot.
+- The reported altitude error was approximately 0.06 m.
 
-**Note:** These results are preliminary and must be reproduced in MATLAB/Simulink before being presented as verified simulation results.
+**Verification note:** These are preliminary results from the Python implementation and have not been independently verified by running the Simulink model. Re-run the MATLAB studies and replace these values if the actual outputs differ.
 
-## ▶️ How to Run the Project
-
-### Requirements
+## 10. Software Requirements
 
 - MATLAB
 - Simulink
+- Python, if reproducing the separate Python study
 
-### Execution
+The project is intended to use MATLAB and Simulink for model construction and simulation. Optional toolbox requirements depend on the blocks used in the installed MATLAB release.
 
-Open MATLAB and navigate to the project directory.
+## 11. How to Run
+
+Clone or download the repository and open MATLAB.
+
+Navigate to the project folder:
 
 ```matlab
 cd windshear_drone_project
+```
+
+Build the Simulink model:
+
+```matlab
 build_drone_windshear_model
+```
+
+Run the study:
+
+```matlab
 run_drone_windshear_study
 ```
 
-All primary model parameters are configured in:
+Review the simulation parameters in:
 
-```matlab
+```text
 drone_windshear_params.m
 ```
 
-If a block-parameter error occurs, check the PID block parameter names supported by your installed MATLAB release.
+If the model-building script reports a PID block parameter error, check the PID block parameter names supported by your MATLAB/Simulink version.
 
-## 📁 Project Structure
+## 12. Expected Graphs
 
-```text
-windshear_drone_project/
-│
-├── README.md
-├── build_drone_windshear_model.m
-├── run_drone_windshear_study.m
-├── drone_windshear_params.m
-│
-└── images/
-    ├── quadrotor_windshear_model.svg
-    └── pid_control_architecture.svg
+Export the following graphs after running the simulation:
+
+- Horizontal position versus time.
+- Altitude versus time.
+- Pitch angle versus time.
+- Horizontal wind velocity versus time.
+- Position error versus time.
+- PID versus PD response.
+- Peak position error versus wind intensity.
+
+Save the generated figures inside the `images` directory.
+
+Example MATLAB command:
+
+```matlab
+exportgraphics(gcf, ...
+    fullfile('images','position_response.png'), ...
+    'Resolution',200);
 ```
 
-Add MATLAB-generated plots to the `images` folder after running the simulation.
+Replace `gcf` with the intended figure selection if necessary.
 
-For example:
+## 13. Limitations
 
-```markdown
-![Position Response](images/position_response.png)
+- The model is simplified and does not represent full six-degree-of-freedom drone dynamics.
+- Rotor aerodynamics and motor mixing may not be fully represented.
+- The wind model is an idealized disturbance.
+- Actual flight performance depends on the drone's mass, inertia, rotor characteristics, sensors, and control frequency.
+- The preliminary results require MATLAB/Simulink verification.
 
-![Altitude Response](images/altitude_response.png)
+## 14. Future Enhancements
 
-![Wind Profile](images/wind_profile.png)
-```
-
-## 🚀 Future Improvements
-
-- Implement full six-degree-of-freedom quadrotor dynamics.
-- Add IMU and GPS sensor noise.
+- Implement full 6-DOF quadrotor dynamics.
+- Add IMU, GPS, and barometer sensor models.
 - Implement an Extended Kalman Filter for state estimation.
-- Add realistic turbulence and gust models.
-- Investigate disturbance-observer-based compensation.
-- Compare PID with LQR and Model Predictive Control.
-- Perform controller gain optimization and robustness testing.
-- Validate the model against experimental flight data.
+- Add realistic turbulence and stochastic wind models.
+- Compare PID, LQR, and Model Predictive Control.
+- Implement disturbance-observer-based wind compensation.
+- Optimize controller gains using MATLAB optimization tools.
+- Perform Monte Carlo robustness analysis.
 
-## 🎓 Applications
+## 15. Applications
 
-- UAV flight control research
-- Drone stability analysis
-- Wind disturbance rejection
-- PID controller design
-- MATLAB/Simulink-based avionics projects
-- Academic research in autonomous aerial vehicles
+- UAV flight-control research.
+- Drone position and altitude stabilization.
+- Wind-disturbance rejection studies.
+- Avionics and embedded-control education.
+- MATLAB/Simulink control-system development.
 
-## ⚠️ Disclaimer
+## 16. Conclusion
 
-This is an educational simulation project. The model is simplified and is not flight-certified. The controller gains and reported results should not be used for real-world flight without appropriate modelling, testing, and validation.
+This project provides an educational framework for studying quadrotor position and altitude control under wind-shear disturbances. It demonstrates the role of PID control in disturbance rejection and highlights the trade-offs between position accuracy, tilt demand, and overshoot.
 
-## 👨‍💻 Author
+The next step is to execute the Simulink model, validate the preliminary results, and include the actual simulation plots in the repository.
 
-**Project:** Quadrotor Drone Wind Shear Simulation Using PID Control
+## Author
 
-**Domain:** Avionics Engineering | UAV Flight Control | Control Systems
+**Project:** Quadrotor Drone Wind-Shear Simulation Using PID Control  
+**Domain:** Avionics, UAV Dynamics, and Flight Control  
+**Tools:** MATLAB, Simulink, and Python
 
-**Tools:** MATLAB, Simulink, Python
+---
 
+*This project is intended for academic simulation and research. It is not a flight-certified control system.*
